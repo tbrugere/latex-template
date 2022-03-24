@@ -1,0 +1,52 @@
+%%%%%%%%%%%%%%%%%%%%%%% packages
+% basic functionality
+% \usepackage[utf8]{inputenc} % <-- does nothing with lualatex. activate for pdflatex
+\usepackage{fontspec} %for fonts
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{hyperref}
+\usepackage{fullpage}
+\usepackage[backend=biber]{biblatex} %for bibliography
+% \usepackage[toc]{glossaries} % can be useful
+
+% graphics
+\usepackage{float} %for H placement 
+\usepackage{placeins} % for \Floatbarrier
+\usepackage{graphicx}
+\usepackage{wrapfig}
+
+%environments
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{comment} % Necessary to comment several paragraphs at once
+
+% font
+ \usepackage{lmodern} 
+% \usepackage{times} 
+% \setmainfont{titillium}%{Times New Roman}
+
+% math
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage{amssymb}
+\usepackage{mathtools} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%% commands
+
+% math commands
+\newcommand{\dps}{\displaystyle}
+% \newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Lim}{\displaystyle\lim}
+\newcommand{\ol}{\overline}
+\renewcommand{\Pr}{\mathbb{P}}
+
+%text commands
+\newcommand{\ie}{\textit{ie }}
+\newcommand{\cf}[1]{(\textit{cf.} page \pageref{#1} — section \ref{#1})}
+\newcommand{\cffig}[1]{(\textit{Figure} \ref{#1})}
+
+
