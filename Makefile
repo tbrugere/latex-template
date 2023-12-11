@@ -1,38 +1,49 @@
-TARGET=main
+BUILDDIR=build
+# FILENAMES=main supplementary
+FILENAMES=main
+# LATEX=lualatex
+LATEX=TEXINPUTS=resources//: pdflatex
+ALL_TEX=$(shell fd -e tex . resources/ text/)
 
-USEBIB=y
+aux_filenames=$(patsubst %,$(BUILDDIR)/%.aux,$(FILENAMES))
+pdf_filenames=$(patsubst %,%.pdf,$(FILENAMES))
+synctex_filenames=$(patsubst %,%.synctex.gz,$(FILENAMES))
 
+BIBTEX ?=bibtex
 
-ifeq ($(USEBIB),y)
-    DEPBIB=%.bbl
-else
-    DEPBIB=
-endif
+all: $(pdf_filenames) $(synctex_filenames) $(ALL_TEX)
 
-all: release
+$(BUILDDIR)/resources: resources | $(BUILDDIR)
+	cd $(BUILDDIR);  ln -s ../resources .
 
-release: pdf clean-temp
+$(BUILDDIR)/text : text | $(BUILDDIR)
+	cd $(BUILDDIR);  ln -s ../text .
 
-grammalecte.txt: $(TARGET).txt
-	grammalecte-cli --opt_off esp typo nbsp apos  -f main.txt > grammalecte.txt
+$(BUILDDIR)/%.aux: $(BUILDDIR)/%.tex | $(BUILDDIR)/resources  $(BUILDDIR)/text
+	cd $(@D); \
+	$(LATEX) -draftmode  $(*F) && \
+	$(BIBTEX) $(*F) && \
+	makeglossaries $(*F) && \
+	$(LATEX) -draftmode $(*F) 
 
-%.txt: %.tex
-	detex $< > $@
+$(BUILDDIR)/%.pdf $(BUILDDIR)/%.synctex.gz: $(BUILDDIR)/%.tex $(BUILDDIR)/%.aux $(aux_filenames) $(ALL_TEX) | $(BUILDDIR)/resources $(BUILDDIR)/text
+	cd $(@D) ; \
+	$(LATEX) --synctex=1 $(*F)
 
-pdf: $(TARGET).pdf 
+$(BUILDDIR)/%.tex: %.tex resources | $(BUILDDIR)
+	cp $< $@
 
-%.pdf: %.tex %.toc $(DEPBIB) 
-	lualatex $<
+rebuttal/%.pdf: $(BUILDDIR)/rebuttal/%.pdf
+	cp $< $@
 
-%.bbl: %.bcf
-	biber $<
+%.pdf: $(BUILDDIR)/%.pdf
+	cp $< $@
 
+%.synctex.gz:  $(BUILDDIR)/%.synctex.gz
+	cp $< $@
 
-%.bcf %.toc &: %.tex
-	lualatex $<
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
-clean: clean-temp
-	rm -f *.pdf *.dvi *.synctex.gz
-
-clean-temp:
-	rm -f *.log *.toc *.aux *.bbl *.blg *.bcf *.run.xml *.out *.fdb_latexmk *.fls *.nav *.snm
+clean:
+	rm build/*
